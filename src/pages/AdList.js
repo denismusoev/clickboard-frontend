@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, Button, Container, Row, Col, Form, Pagination } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function AdList() {
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const initialTitle = queryParams.get('title') || '';
+    const initialCategoryId = queryParams.get('categoryId') || null;
     const [ads, setAds] = useState([]);
-    const [title, setTitle] = useState('');
-    const [categoryId, setCategoryId] = useState(null);
+    const [title, setTitle] = useState(initialTitle);
+    const [categoryId, setCategoryId] = useState(initialCategoryId);
     const [minPrice, setMinPrice] = useState('');
     const [maxPrice, setMaxPrice] = useState('');
     const [page, setPage] = useState(0);
@@ -24,6 +28,8 @@ function AdList() {
                 params: {
                     title,
                     categoryId,
+                    minPrice,
+                    maxPrice,
                     page,
                     size: 10
                 }
@@ -105,7 +111,7 @@ function AdList() {
                             </Form.Select>
                         </Form.Group>
 
-                        <Button style={{ backgroundColor: "#d08b92", color: "#000000", border: 0 }} type="submit" className="w-100">Применить</Button>
+                        {/*<Button style={{ backgroundColor: "#d08b92", color: "#000000", border: 0 }} type="submit" className="w-100">Применить</Button>*/}
                     </Form>
                 </Col>
 
@@ -113,7 +119,7 @@ function AdList() {
                 <Col md={9} lg={8}>
                     <Form onSubmit={handleFilter} className="mb-4">
                         <Row className="g-2">
-                            <Col md={10}>
+                            <Col md={12}>
                                 <Form.Control
                                     type="text"
                                     placeholder="Поиск по названию"
@@ -121,9 +127,9 @@ function AdList() {
                                     onChange={(e) => setTitle(e.target.value)}
                                 />
                             </Col>
-                            <Col md={2}>
-                                <Button type="submit" style={{ backgroundColor: "#d08b92", color: "#000000", border: 0 }} className="w-100 shadow-sm">Поиск</Button>
-                            </Col>
+                            {/*<Col md={2}>*/}
+                            {/*    <Button type="submit" style={{ backgroundColor: "#d08b92", color: "#000000", border: 0 }} className="w-100 shadow-sm">Поиск</Button>*/}
+                            {/*</Col>*/}
                         </Row>
                     </Form>
 

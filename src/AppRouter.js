@@ -34,7 +34,7 @@ const AnimatedRoutes = () => {
             <AnimatePresence mode="wait">
                 {/*<div style={{position: 'absolute', width: '100%'}}>*/}
                 <Routes location={location} key={location.pathname}>
-                    <Route path="/" element={<motion.div {...pageTransition}><AdList /></motion.div>}/>
+                    <Route path="/ads" element={<motion.div {...pageTransition}><AdList /></motion.div>}/>
                     <Route path="/ads/:id" element={<motion.div {...pageTransition}><AdDetail /></motion.div>}/>
                     <Route path="/home" element={<motion.div {...pageTransition}><HomePage /></motion.div>}/>
                     <Route path="/register" element={<motion.div {...pageTransition}><Signup  /></motion.div>}/>
