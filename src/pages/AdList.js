@@ -64,9 +64,9 @@ function AdList() {
 
     return (
         <Container>
-            <Row className="my-4">
+            <Row className="my-4 gx-5 justify-content-evenly">
                 {/* Sidebar filters */}
-                <Col md={9} lg={3} style={{ height: "fit-content" }} className="bg-light p-3 mb-3 rounded shadow-sm">
+                <Col md={9} lg={3} style={{ backgroundColor:"#f6f3f3", height: "fit-content" }} className=" p-3 mb-3 rounded shadow-sm">
                     <h5>Фильтры</h5>
                     <Form onSubmit={handleFilter}>
                         <Form.Group className="mb-3">
@@ -105,25 +105,24 @@ function AdList() {
                             </Form.Select>
                         </Form.Group>
 
-                        <Button variant="primary" type="submit" className="w-100">Применить</Button>
+                        <Button style={{ backgroundColor: "#d08b92", color: "#000000", border: 0 }} type="submit" className="w-100">Применить</Button>
                     </Form>
                 </Col>
 
                 {/* Ads listing */}
-                <Col md={9} lg={9}>
+                <Col md={9} lg={8}>
                     <Form onSubmit={handleFilter} className="mb-4">
                         <Row className="g-2">
-                            <Col md={8}>
+                            <Col md={10}>
                                 <Form.Control
                                     type="text"
                                     placeholder="Поиск по названию"
                                     value={title}
                                     onChange={(e) => setTitle(e.target.value)}
-                                    className="shadow-sm"
                                 />
                             </Col>
-                            <Col md={4}>
-                                <Button type="submit" variant="primary" className="w-100 shadow-sm">Поиск</Button>
+                            <Col md={2}>
+                                <Button type="submit" style={{ backgroundColor: "#d08b92", color: "#000000", border: 0 }} className="w-100 shadow-sm">Поиск</Button>
                             </Col>
                         </Row>
                     </Form>
@@ -131,21 +130,20 @@ function AdList() {
                     <Row>
                         {ads.map((ad) => (
                             <Col key={ad.id} xs={12} className="mb-4">
-                                <Card className="shadow-sm border-0">
+                                <Card onClick={() => navigate(`/ads/${ad.id}`)} style={{ cursor: 'pointer', backgroundColor: "#ffffff" }} className="shadow-sm border-0">
                                     <Row className="g-0">
                                         <Col md={4}>
                                             <Card.Img
-                                                style={{ height: '100%', objectFit: 'cover' }}
+                                                style={{ width: "100%", height: '100%', objectFit: 'cover' }}
                                                 variant="top"
                                                 src={ad.photoUrls[0] || 'placeholder.jpg'}
                                             />
                                         </Col>
-                                        <Col md={8}>
+                                        <Col md={8} style={{ display: 'flex', flexDirection: 'column', alignItems: 'space-between', justifyContent: 'center' }}>
                                             <Card.Body>
                                                 <Card.Title className="text-truncate">{ad.title}</Card.Title>
                                                 <Card.Text className="text-muted">{ad.description}</Card.Text>
                                                 <Card.Text><strong>{ad.price} ₽</strong></Card.Text>
-                                                <Button variant="outline-primary" onClick={() => navigate(`/ads/${ad.id}`)}>Подробнее</Button>
                                             </Card.Body>
                                         </Col>
                                     </Row>

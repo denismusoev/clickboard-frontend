@@ -30,7 +30,7 @@ function HomePage() {
 
     return (
         <Container>
-            <h1 className="my-4 text-center" style={{ color: '#006fff' }}>Найдите то, что вам нужно</h1>
+            <h1 className="my-4 text-center" style={{ color: '#494949' }}>Найдите то, что вам нужно</h1>
 
             <Form onSubmit={handleSearch} className="mb-4">
                 <Row className="justify-content-center">
@@ -45,16 +45,16 @@ function HomePage() {
                         />
                     </Col>
                     <Col md={2}>
-                        <Button type="submit" style={{ backgroundColor: '#2563EB', border: 'none' }} className="w-100 shadow-sm">Поиск</Button>
+                        <Button type="submit" style={{ backgroundColor: "#d08b92", color: "#000000", border: 'none' }} className="w-100">Поиск</Button>
                     </Col>
                 </Row>
             </Form>
 
-            <h2 className="my-4" style={{ color: '#006fff' }}>Категории</h2>
+            <h2 className="my-4" style={{ color: '#494949' }}>Категории</h2>
             <Row className="mb-4">
                 {categories.map((category) => (
                     <Col key={category.id} xs={6} sm={4} md={3} lg={2} className="mb-4">
-                        <Card className="shadow-sm border-0 h-100 text-center" style={{ backgroundColor: '#F1F5F9' }}>
+                        <Card className="shadow-sm border-0 h-100 text-center" style={{ backgroundColor: '#eae8e8' }}>
                             <div className="d-flex justify-content-center align-items-center">
                                 <Card.Img
                                     variant="top"

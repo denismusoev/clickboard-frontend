@@ -2,7 +2,7 @@
 .app-wrapper {
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Высота экрана */
+    min-height: 120vh; /* Высота экрана */
 }
 
 .content {

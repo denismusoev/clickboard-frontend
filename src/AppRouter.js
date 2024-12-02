@@ -8,6 +8,8 @@ import AdList from './pages/AdList';
 import AdDetail from './pages/AdDetail';
 import {Footer, Header} from "./components/HeaderFooter";
 import HomePage from "./pages/HomePage";
+import Signup from "./pages/Signup";
+import Signin from "./pages/Signin";
 
 const AnimatedRoutes = () => {
     const location = useLocation(); // Получаем текущее местоположение для ключа анимации
@@ -35,6 +37,8 @@ const AnimatedRoutes = () => {
                     <Route path="/" element={<motion.div {...pageTransition}><AdList /></motion.div>}/>
                     <Route path="/ads/:id" element={<motion.div {...pageTransition}><AdDetail /></motion.div>}/>
                     <Route path="/home" element={<motion.div {...pageTransition}><HomePage /></motion.div>}/>
+                    <Route path="/register" element={<motion.div {...pageTransition}><Signup  /></motion.div>}/>
+                    <Route path="/signin" element={<motion.div {...pageTransition}><Signin  /></motion.div>}/>
                 </Routes>
                 {/*</div>*/}
             </AnimatePresence>
@@ -44,75 +48,17 @@ const AnimatedRoutes = () => {
 
 const AppRouter = () => {
     return (
-        <div className="app-wrapper" style={{ backgroundColor: "#ffffff"}}>
-            <Header />
-            <div className="content">
-                <Router>
-                    <AnimatedRoutes />
-                </Router>
+        <Router>
+            <div className="app-wrapper" style={{backgroundColor: "#fcfcfd"}}>
+                <Header/>
+                <div className="content">
+                    <AnimatedRoutes/>
+                </div>
+                <Footer/>
             </div>
-            <Footer />
-        </div>
+        </Router>
     );
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 export default AppRouter;
