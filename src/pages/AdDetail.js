@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 import { Card, Container, Row, Col, Badge, Spinner, Button, ListGroup } from 'react-bootstrap';
 
 function AdDetail() {
@@ -29,6 +32,15 @@ function AdDetail() {
         );
     }
 
+    const sliderSettings = {
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        arrows: true,
+    };
+
     return (
         <Container className="my-4">
             <Row>
@@ -38,11 +50,25 @@ function AdDetail() {
                 </Col>
                 <Col md={8}>
                     <Card className="mb-4">
-                        <Card.Img
-                            variant="top"
-                            src={ad.photoUrls[0] || 'placeholder.jpg'}
-                            style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
-                        />
+                        {ad.photoUrls && ad.photoUrls.length > 0 ? (
+                            <Slider {...sliderSettings}>
+                                {ad.photoUrls.map((url, index) => (
+                                    <div key={index}>
+                                        <img
+                                            src={url}
+                                            alt={`Фото ${index + 1}`}
+                                            style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+                                        />
+                                    </div>
+                                ))}
+                            </Slider>
+                        ) : (
+                            <Card.Img
+                                variant="top"
+                                src="placeholder.jpg"
+                                style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+                            />
+                        )}
                     </Card>
                     <h4>Характеристики</h4>
                     <ListGroup>
