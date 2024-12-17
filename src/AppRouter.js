@@ -11,6 +11,8 @@ import HomePage from "./pages/HomePage";
 import Signup from "./pages/Signup";
 import Signin from "./pages/Signin";
 import CreateAdPage from "./pages/CreateAdPage";
+import ModerationPage from "./pages/ModerationPage";
+import ProfilePage from "./pages/ProfilePage";
 
 const AnimatedRoutes = () => {
     const location = useLocation(); // Получаем текущее местоположение для ключа анимации
@@ -41,6 +43,9 @@ const AnimatedRoutes = () => {
                     <Route path="/register" element={<motion.div {...pageTransition}><Signup  /></motion.div>}/>
                     <Route path="/signin" element={<motion.div {...pageTransition}><Signin  /></motion.div>}/>
                     <Route path="/create-ad" element={<motion.div {...pageTransition}><CreateAdPage  /></motion.div>}/>
+                    <Route path="/moderation" element={<motion.div {...pageTransition}><ModerationPage /></motion.div>}/>
+                    <Route path="/profile" element={<ProfilePage />} />
+
                 </Routes>
                 {/*</div>*/}
             </AnimatePresence>

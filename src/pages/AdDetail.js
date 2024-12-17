@@ -9,19 +9,29 @@ import { Card, Container, Row, Col, Badge, Spinner, Button, ListGroup } from 're
 function AdDetail() {
     const { id } = useParams();
     const [ad, setAd] = useState(null);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         fetchAd();
     }, []);
 
     const fetchAd = async () => {
-        try {
-            const response = await axios.get(`http://localhost:8080/ads/${id}`);
-            setAd(response.data);
-        } catch (error) {
-            console.error('Error fetching ad details:', error);
-        }
+        axios.get(`http://localhost:8080/ads/${id}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        })
+            .then((response) => {
+                setAd(response.data);
+            })
+            .catch((error) => {
+                setError('Доступ запрещен или объявление не найдено.');
+            });
     };
+
+    if (error) {
+        return <div className="container mt-5"><h1>{error}</h1></div>;
+    }
 
     if (!ad) {
         return (
@@ -33,20 +43,21 @@ function AdDetail() {
     }
 
     const sliderSettings = {
-        dots: true,
-        infinite: true,
+        dots: ad.photoUrls.length > 1, // Показывать точки только если больше 1 фото
+        infinite: ad.photoUrls.length > 1, // Отключить бесконечный режим для 1 фото
         speed: 500,
         slidesToShow: 1,
         slidesToScroll: 1,
-        arrows: true,
+        arrows: ad.photoUrls.length > 1, // Стрелки только при наличии нескольких фото
     };
+
 
     return (
         <Container className="my-4">
             <Row>
                 <Col md={12}>
                     <h1 className="mb-4">{ad.title}</h1>
-                    <p className="text-muted">Категория: <Badge bg="secondary">{ad.categoryId}</Badge></p>
+                    <p className="text-muted">Категория: <Badge bg="secondary">{ad.categoryName}</Badge></p>
                 </Col>
                 <Col md={8}>
                     <Card className="mb-4">
@@ -70,6 +81,7 @@ function AdDetail() {
                             />
                         )}
                     </Card>
+
                     <h4>Характеристики</h4>
                     <ListGroup>
                         {Object.entries(ad.attributes).map(([key, value]) => (
@@ -90,9 +102,8 @@ function AdDetail() {
                     <Card className="border-0 shadow-sm">
                         <Card.Body>
                             <h5>Контакт продавца</h5>
-                            <p><strong>Имя:</strong> {ad.sellerName || 'Кристина'}</p>
+                            <p><strong>Имя:</strong> {`${ad.sellerFirstName} ${ad.sellerLastName}` || 'Не указано'}</p>
                             <p><strong>Телефон:</strong> {ad.sellerPhone || 'Не указан'}</p>
-                            <Button variant="secondary" className="w-100 mt-3">Показать телефон</Button>
                         </Card.Body>
                     </Card>
                 </Col>

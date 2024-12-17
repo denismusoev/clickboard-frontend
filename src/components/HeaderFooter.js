@@ -1,28 +1,133 @@
-import React from 'react';
-import { Navbar, Nav, Container, Button, Row, Col } from 'react-bootstrap';
+import React, {useEffect, useState} from 'react';
+import SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
+import {Navbar, Nav, Container, Button, Row, Col, Dropdown} from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+
 
 function Header() {
     const navigate = useNavigate();
-    const username = localStorage.getItem('username');
+    const username = localStorage.getItem("username");
+    const token = localStorage.getItem("token"); // Получаем JWT токен из localStorage
+    const [notifications, setNotifications] = useState([]);
+    const [showNotifications, setShowNotifications] = useState(false);
+
+    // Опрос сервера на предмет новых уведомлений
+    useEffect(() => {
+        const fetchNotifications = () => {
+            fetch(`http://localhost:8080/api/notifications/unread`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    setNotifications(data);
+                })
+                .catch((error) =>
+                    console.error("Ошибка получения уведомлений:", error)
+                );
+        };
+
+        fetchNotifications();
+        const intervalId = setInterval(fetchNotifications, 5000);
+
+        return () => clearInterval(intervalId);
+    }, [token]);
+
+    // Пометка уведомления как прочитанного
+    const markAsRead = (id) => {
+        fetch(`http://localhost:8080/api/notifications/read/${id}`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }).then(() => {
+            setNotifications((prev) => prev.filter((note) => note.id !== id));
+        });
+    };
 
     const handleLogout = () => {
-        localStorage.removeItem('username');
-        localStorage.removeItem('token'); // Удаление токена при выходе
-        navigate('/signin'); // Перенаправление на страницу авторизации
+        localStorage.removeItem("username");
+        localStorage.removeItem("token"); // Удаление токена при выходе
+        navigate("/signin"); // Перенаправление на страницу авторизации
     };
 
     return (
-        <Navbar style={{ backgroundColor: "#fefdfd" }} variant="light" expand="lg" className="shadow-sm">
+        <Navbar
+            style={{ backgroundColor: "#fefdfd" }}
+            variant="light"
+            expand="lg"
+            className="shadow-sm"
+        >
             <Container>
-                <Navbar.Brand href="/home">
-                    Сервис объявлений PostHub
-                </Navbar.Brand>
+                <Navbar.Brand href="/home">Сервис объявлений PostHub</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="ms-auto">
                         {username ? (
                             <>
+                                {/* Иконка уведомлений */}
+                                <Dropdown
+                                    align="end"
+                                    show={showNotifications}
+                                    onToggle={() => setShowNotifications(!showNotifications)}
+                                >
+                                    <Dropdown.Toggle
+                                        variant="light"
+                                        id="dropdown-notifications"
+                                        className="border-0 me-3"
+                                    >
+                                        🔔
+                                        {notifications.length > 0 && (
+                                            <span
+                                                style={{
+                                                    color: "red",
+                                                    fontWeight: "bold",
+                                                    marginLeft: "5px"
+                                                }}
+                                            >
+                    {notifications.length}
+                </span>
+                                        )}
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu style={{ maxHeight: "300px", overflowY: "auto" }}>
+                                        {notifications.length > 0 ? (
+                                            notifications.map((note) => (
+                                                <Dropdown.Item
+                                                    key={note.id}
+                                                    className="text-wrap"
+                                                    onClick={() => markAsRead(note.id)}
+                                                >
+                                                    <div>
+                                                        <strong>{note.message}</strong>
+                                                    </div>
+                                                    <div style={{ fontSize: "12px", color: "gray" }}>
+                                                        {new Date(note.createdAt).toLocaleString()}
+                                                    </div>
+                                                    <a
+                                                        href={`/ads/${note.adId}`}
+                                                        style={{ fontSize: "12px", color: "#007bff" }}
+                                                    >
+                                                        Перейти к объявлению
+                                                    </a>
+                                                </Dropdown.Item>
+                                            ))
+                                        ) : (
+                                            <Dropdown.Item disabled>Уведомлений нет</Dropdown.Item>
+                                        )}
+                                    </Dropdown.Menu>
+                                </Dropdown>
+
+                                {/* Кнопка создания объявления */}
+                                <Button
+                                    variant="success"
+                                    href="/create-ad"
+                                    className="me-2 border-0"
+                                >
+                                    Создать объявление
+                                </Button>
+
                                 <Button
                                     variant="outline-dark"
                                     href="/profile"
@@ -38,6 +143,7 @@ function Header() {
                                     Выйти
                                 </Button>
                             </>
+
                         ) : (
                             <>
                                 <Button
