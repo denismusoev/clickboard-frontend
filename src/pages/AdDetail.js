@@ -93,6 +93,8 @@ function AdDetail() {
                 return 'Отклонено';
             case 'ARCHIVED':
                 return 'В архиве';
+            case 'BLOCKED':
+                return 'Заблокировано';
             default:
                 return 'Неизвестный статус';
         }

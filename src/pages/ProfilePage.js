@@ -85,7 +85,9 @@ const ProfilePage = () => {
                                         ? "Отклонено"
                                         : ad.status === "ARCHIVED"
                                             ? "Архивировано"
-                                            : "Неизвестно"}
+                                            : ad.status === "BLOCKED"
+                                                ? "Заблокировано"
+                                                    : "Неизвестно"}
                         </span>
                                         </Card.Text>
                                         <Button variant="primary" href={`/ads/${ad.id}`}>
