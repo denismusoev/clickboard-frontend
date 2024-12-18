@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {config, useTransition} from 'react-spring';
-import {BrowserRouter as Router, Route, Routes, useLocation} from 'react-router-dom';
+import {BrowserRouter as Router, Navigate, Route, Routes, useLocation} from 'react-router-dom';
 import './transitions.css';
 import './AppRouter.css';
 import {AnimatePresence, motion} from 'framer-motion';
@@ -13,9 +13,12 @@ import Signin from "./pages/Signin";
 import CreateAdPage from "./pages/CreateAdPage";
 import ModerationPage from "./pages/ModerationPage";
 import ProfilePage from "./pages/ProfilePage";
+import SavedAdsPage from "./pages/SavedAdsPage";
+import EditAdPage from "./pages/EditAdPage";
 
 const AnimatedRoutes = () => {
     const location = useLocation(); // Получаем текущее местоположение для ключа анимации
+    const role = localStorage.getItem("role");
 
     const transitions = useTransition(location, {
         from: {opacity: 0, transform: 'translate3d(10%,0,0)'},
@@ -36,16 +39,33 @@ const AnimatedRoutes = () => {
         <>
             <AnimatePresence mode="wait">
                 {/*<div style={{position: 'absolute', width: '100%'}}>*/}
-                <Routes location={location} key={location.pathname}>
-                    <Route path="/ads" element={<motion.div {...pageTransition}><AdList /></motion.div>}/>
-                    <Route path="/ads/:id" element={<motion.div {...pageTransition}><AdDetail /></motion.div>}/>
-                    <Route path="/home" element={<motion.div {...pageTransition}><HomePage /></motion.div>}/>
-                    <Route path="/register" element={<motion.div {...pageTransition}><Signup  /></motion.div>}/>
-                    <Route path="/signin" element={<motion.div {...pageTransition}><Signin  /></motion.div>}/>
-                    <Route path="/create-ad" element={<motion.div {...pageTransition}><CreateAdPage  /></motion.div>}/>
-                    <Route path="/moderation" element={<motion.div {...pageTransition}><ModerationPage /></motion.div>}/>
-                    <Route path="/profile" element={<ProfilePage />} />
+                <Routes>
+                    {/* Общие маршруты */}
+                    <Route path="/signin" element={<Signin />} />
+                    <Route path="/register" element={<Signup />} />
 
+                    {/* Маршруты для пользователей */}
+                    {role === 'USER' && (
+                        <>
+                            <Route path="/home" element={<HomePage />} />
+                            <Route path="/create-ad" element={<CreateAdPage />} />
+                            <Route path="/profile" element={<ProfilePage />} />
+                            <Route path="/ads" element={<AdList />} />
+                            <Route path="/ads/:id" element={<AdDetail />} />
+                            <Route path="*" element={<Navigate to="/home" />} />
+                            <Route path="/saved-ads" element={<SavedAdsPage />} />
+                            {/*<Route path="/edit-ad/:id" element={<EditAdPage />} />*/}
+                        </>
+                    )}
+
+                    {/* Маршруты для админов */}
+                    {role === 'ADMIN' && (
+                        <>
+                            <Route path="/moderation" element={<ModerationPage />} />
+                            <Route path="/ads/:id" element={<AdDetail />} />
+                            <Route path="*" element={<Navigate to="/moderation" />} />
+                        </>
+                    )}
                 </Routes>
                 {/*</div>*/}
             </AnimatePresence>

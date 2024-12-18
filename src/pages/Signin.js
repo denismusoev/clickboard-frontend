@@ -23,6 +23,7 @@ function Signin() {
             const response = await axios.post('http://localhost:8080/authenticate', formData);
             localStorage.setItem('token', response.data.token); // Сохранение токена
             localStorage.setItem('username', response.data.username); // Сохранение токена
+            localStorage.setItem('role', response.data.role); // Сохранение токена
             navigate("/home");
             setMessage('Авторизация прошла успешно!');
             setError(false);
