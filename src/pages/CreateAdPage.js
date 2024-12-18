@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 
 const CreateAdPage = () => {
-    const navigate = useNavigate(); // Хук для навигации
+    const navigate = useNavigate();
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [price, setPrice] = useState('');
@@ -15,7 +15,8 @@ const CreateAdPage = () => {
     const [photos, setPhotos] = useState([]);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
-    const [isLoading, setIsLoading] = useState(false); // Флаг загрузки
+    const [isLoading, setIsLoading] = useState(false);
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         axios.get('http://localhost:8080/categories')
@@ -54,8 +55,48 @@ const CreateAdPage = () => {
         setPhotos((prevPhotos) => [...prevPhotos, ...base64Files]);
     };
 
+    const validateFields = () => {
+        const newErrors = {};
+
+        if (!title.trim()) {
+            newErrors.title = 'Введите заголовок';
+        }
+
+        if (!description.trim()) {
+            newErrors.description = 'Введите описание';
+        }
+
+        if (!price) {
+            newErrors.price = 'Укажите цену';
+        } else if (isNaN(price) || parseFloat(price) <= 0) {
+            newErrors.price = 'Цена должна быть числом больше 0';
+        }
+
+        if (!categoryId) {
+            newErrors.categoryId = 'Выберите категорию';
+        }
+
+        // Если для атрибутов требуется обязательное значение, можно добавить их проверку здесь.
+        // Допустим, что все атрибуты являются обязательными:
+        attributes.forEach((attr) => {
+            if (!attributeValues[attr.id] || !attributeValues[attr.id].trim()) {
+                newErrors[`attribute_${attr.id}`] = `Введите значение для "${attr.name}"`;
+            }
+        });
+
+        return newErrors;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        const validationErrors = validateFields();
+
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
+        setErrors({}); // Очистим ошибки, если они были
 
         const adData = {
             title,
@@ -67,7 +108,7 @@ const CreateAdPage = () => {
         };
 
         try {
-            setIsLoading(true); // Включаем загрузку
+            setIsLoading(true);
             const token = localStorage.getItem('token');
             await axios.post('http://localhost:8080/ads', adData, {
                 headers: {
@@ -77,11 +118,11 @@ const CreateAdPage = () => {
 
             setSuccess(true);
             setTimeout(() => navigate('/home'), 2000);
-        } catch (error) {
-            console.error('Ошибка:', error);
+        } catch (err) {
+            console.error('Ошибка:', err);
             setError('Не удалось создать объявление. Попробуйте ещё раз.');
         } finally {
-            setIsLoading(false); // Отключаем загрузку
+            setIsLoading(false);
         }
     };
 
@@ -92,51 +133,50 @@ const CreateAdPage = () => {
             {success && <div className="alert alert-success">Объявление успешно создано! Перенаправление...</div>}
 
             <form onSubmit={handleSubmit} className="shadow p-4 rounded bg-light">
-                <fieldset disabled={isLoading}> {/* Блокируем форму */}
+                <fieldset disabled={isLoading}>
                     <div className="mb-3">
                         <label htmlFor="title" className="form-label">Заголовок</label>
                         <input
                             type="text"
                             id="title"
-                            className="form-control"
+                            className={`form-control ${errors.title ? 'is-invalid' : ''}`}
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                             placeholder="Введите заголовок"
-                            required
                         />
+                        {errors.title && <div className="invalid-feedback">{errors.title}</div>}
                     </div>
                     <div className="mb-3">
                         <label htmlFor="description" className="form-label">Описание</label>
                         <textarea
                             id="description"
-                            className="form-control"
+                            className={`form-control ${errors.description ? 'is-invalid' : ''}`}
                             rows="3"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Введите описание"
-                            required
                         ></textarea>
+                        {errors.description && <div className="invalid-feedback">{errors.description}</div>}
                     </div>
                     <div className="mb-3">
                         <label htmlFor="price" className="form-label">Цена</label>
                         <input
                             type="number"
                             id="price"
-                            className="form-control"
+                            className={`form-control ${errors.price ? 'is-invalid' : ''}`}
                             value={price}
                             onChange={(e) => setPrice(e.target.value)}
                             placeholder="Введите цену"
-                            required
                         />
+                        {errors.price && <div className="invalid-feedback">{errors.price}</div>}
                     </div>
                     <div className="mb-3">
                         <label htmlFor="categoryId" className="form-label">Категория</label>
                         <select
                             id="categoryId"
-                            className="form-select"
+                            className={`form-select ${errors.categoryId ? 'is-invalid' : ''}`}
                             value={categoryId}
                             onChange={(e) => setCategoryId(e.target.value)}
-                            required
                         >
                             <option value="">Выберите категорию</option>
                             {categories.map((category) => (
@@ -145,7 +185,9 @@ const CreateAdPage = () => {
                                 </option>
                             ))}
                         </select>
+                        {errors.categoryId && <div className="invalid-feedback">{errors.categoryId}</div>}
                     </div>
+
                     {attributes.length > 0 && (
                         <div className="mb-3">
                             <label className="form-label">Дополнительные атрибуты</label>
@@ -154,16 +196,20 @@ const CreateAdPage = () => {
                                     <label className="form-label">{attribute.name}</label>
                                     <input
                                         type={attribute.valueType === 'number' ? 'number' : 'text'}
-                                        className="form-control"
+                                        className={`form-control ${errors[`attribute_${attribute.id}`] ? 'is-invalid' : ''}`}
                                         onChange={(e) =>
                                             handleAttributeChange(attribute.id, e.target.value)
                                         }
                                         placeholder={`Введите ${attribute.name}`}
                                     />
+                                    {errors[`attribute_${attribute.id}`] && (
+                                        <div className="invalid-feedback">{errors[`attribute_${attribute.id}`]}</div>
+                                    )}
                                 </div>
                             ))}
                         </div>
                     )}
+
                     <div className="mb-3">
                         <label htmlFor="photos" className="form-label">Фотографии</label>
                         <input
